@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.androchef.cameraxfacedetection.camerax.CameraManager
 import com.androchef.cameraxfacedetection.databinding.ActivityMainBinding
+import com.androchef.cameraxfacedetection.face_detection.FaceStatus
+import com.androchef.cameraxfacedetection.utils.tools
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +27,10 @@ class MainActivity : AppCompatActivity() {
         createCameraManager()
         checkForPermission()
         onClicks()
+
+//        if (!tools.checkPermission(this, NEEDED_PERMISSIONS)) {
+//            ActivityCompat.requestPermissions(this, NEEDED_PERMISSIONS, 999)
+//        }
     }
 
     private fun checkForPermission() {
@@ -33,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 REQUIRED_PERMISSIONS,
-                REQUEST_CODE_PERMISSIONS
+                REQUEST_CODE_PERMISSIONS,
             )
         }
     }
@@ -49,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 cameraManager.startCamera()
@@ -65,8 +73,13 @@ class MainActivity : AppCompatActivity() {
             this,
             binding.previewViewFinder,
             this,
-            binding.graphicOverlayFinder
+            binding.graphicOverlayFinder,
+            ::processPicture
         )
+    }
+    private fun processPicture(faceStatus: FaceStatus) {
+        Log.e("facestatus","This is it ${faceStatus.name}")
+//       when(faceStatus){}
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -75,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
+        private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA,android.Manifest.permission.READ_EXTERNAL_STORAGE,android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
 
 }
