@@ -1,5 +1,6 @@
 package com.androchef.cameraxfacedetection.camerax
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.ScaleGestureDetector
@@ -13,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.androchef.cameraxfacedetection.face_detection.FaceContourDetectionProcessor
 import com.androchef.cameraxfacedetection.face_detection.FaceStatus
+import com.google.mlkit.vision.face.Face
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -20,15 +22,17 @@ class CameraManager(
     private val context: Context,
     private val finderView: PreviewView,
     private val lifecycleOwner: LifecycleOwner,
-    private val graphicOverlay: GraphicOverlay,
+    val graphicOverlay: GraphicOverlay,
     private val onSuccessCallback: ((FaceStatus) -> Unit)
 ) {
 
     private var preview: Preview? = null
+    public var tempFaceList2:List<Face>? = null
 
     private var camera: Camera? = null
     private lateinit var cameraExecutor: ExecutorService
-    private var cameraSelectorOption = CameraSelector.LENS_FACING_FRONT
+    private var cameraSelectorOption = CameraSelector.LENS_FACING_BACK
+//    private var cameraSelectorOption = CameraSelector.LENS_FACING_FRONT
     private var cameraProvider: ProcessCameraProvider? = null
 
     private var imageAnalyzer: ImageAnalysis? = null
@@ -54,7 +58,9 @@ class CameraManager(
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
                     .also {
-                        it.setAnalyzer(cameraExecutor, selectAnalyzer())
+                        val a= selectAnalyzer()
+//                        a.
+//                        it.setAnalyzer(cameraExecutor, a)
                     }
 
                 val cameraSelector = CameraSelector.Builder()
@@ -67,6 +73,7 @@ class CameraManager(
         )
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     private fun selectAnalyzer(): ImageAnalysis.Analyzer {
         return FaceContourDetectionProcessor(graphicOverlay,onSuccessCallback)
     }

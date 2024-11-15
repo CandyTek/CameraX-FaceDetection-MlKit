@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">CameraXFaceDetection</string>
-    <string name="switch_camera">Switch Camera</string>
+    <string name="switch_camera">切换</string>
 </resources>

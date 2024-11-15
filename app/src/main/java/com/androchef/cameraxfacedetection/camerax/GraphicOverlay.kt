@@ -31,7 +31,7 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
     private var isImageFlipped = false
 
     private val lock = Any()
-    private val graphics: MutableList<Graphic> = ArrayList()
+    val graphics: MutableList<Graphic> = ArrayList()
     var mScale: Float? = null
     var mOffsetX: Float? = null
     var mOffsetY: Float? = null

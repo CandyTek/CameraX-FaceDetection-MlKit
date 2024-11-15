@@ -2,6 +2,7 @@ package com.androchef.cameraxfacedetection.face_detection
 
 import android.graphics.Rect
 import android.util.Log
+import androidx.camera.core.ExperimentalGetImage
 import com.androchef.cameraxfacedetection.camerax.BaseImageAnalyzer
 import com.androchef.cameraxfacedetection.camerax.GraphicOverlay
 import com.google.android.gms.tasks.Task
@@ -11,10 +12,21 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.IOException
 
-class FaceContourDetectionProcessor(private val view: GraphicOverlay,
-                                    private val onSuccessCallback: ((FaceStatus) -> Unit)) :
+@ExperimentalGetImage
+class FaceContourDetectionProcessor(
+    private val view: GraphicOverlay,
+    private val onSuccessCallback: ((FaceStatus) -> Unit)
+) :
     BaseImageAnalyzer<List<Face>>() {
+    
+    public var tempFaceList:List<Face>? = null 
 
+//    private val realTimeOpts = FaceDetectorOptions.Builder()
+//        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+//        .setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+//        .setMinFaceSize(0.04f)
+//        .enableTracking()
+//        .build()
     private val realTimeOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         .setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
@@ -42,21 +54,22 @@ class FaceContourDetectionProcessor(private val view: GraphicOverlay,
         graphicOverlay: GraphicOverlay,
         rect: Rect
     ) {
+        tempFaceList = results
         graphicOverlay.clear()
-        if (results.isNotEmpty()){
+        if (results.isNotEmpty()) {
             results.forEach {
-                val faceGraphic = FaceContourGraphic(graphicOverlay, it, rect
-                    ,onSuccessCallback)
+                val faceGraphic = FaceContourGraphic(
+                    graphicOverlay, it, rect, onSuccessCallback
+                )
                 graphicOverlay.add(faceGraphic)
             }
             graphicOverlay.postInvalidate()
-        }else{
+        } else {
             onSuccessCallback(FaceStatus.NO_FACE)
             Log.e(TAG, "Face Detector failed.")
         }
 
     }
-
 
 
     override fun onFailure(e: Exception) {

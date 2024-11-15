@@ -2,16 +2,18 @@ package com.androchef.cameraxfacedetection
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.androchef.cameraxfacedetection.camerax.CameraManager
 import com.androchef.cameraxfacedetection.databinding.ActivityMainBinding
 import com.androchef.cameraxfacedetection.face_detection.FaceStatus
-import com.androchef.cameraxfacedetection.utils.tools
+import java.util.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,10 +29,45 @@ class MainActivity : AppCompatActivity() {
         createCameraManager()
         checkForPermission()
         onClicks()
+        cameraManager.graphicOverlay.toggleSelector()
 
 //        if (!tools.checkPermission(this, NEEDED_PERMISSIONS)) {
 //            ActivityCompat.requestPermissions(this, NEEDED_PERMISSIONS, 999)
 //        }
+
+        binding.btnRandomChooseHuman.setOnClickListener {
+            val r = Random()
+            val i: Int = r.nextInt(cameraManager.graphicOverlay.graphics.size)
+            
+//            msgbox(i.toString())
+            // 获取 TextureView 的 bitmap
+            val bitmap2 = binding.previewViewFinder.bitmap
+            // 获取 TextureView 的变换矩阵
+//            val matrix = cameraManager.graphicOverlay.graphics.get(i).calculateRect()
+//            val matrix = cameraManager.graphicOverlay.face
+            
+            // 对 Bitmap 应用变换矩阵
+            var bitmap3: Bitmap? = null
+            bitmap2?.let {
+//                bitmap3 = Bitmap.createBitmap(it, 0, 0, it.getWidth(), it.getHeight(), matrix, true)
+            }
+            binding.ivRandom.setImageBitmap(bitmap3)
+
+            try {
+                bitmap2?.recycle()
+            } catch (e: Exception) {
+            }
+
+        }
+    }
+    
+    fun msgbox(msg:String){
+        AlertDialog.Builder(this)
+            .setTitle("消息")
+            .setMessage(msg)
+            .setPositiveButton(getString(android.R.string.yes), null)
+            .show()
+
     }
 
     private fun checkForPermission() {
@@ -78,7 +115,10 @@ class MainActivity : AppCompatActivity() {
         )
     }
     private fun processPicture(faceStatus: FaceStatus) {
-        Log.e("facestatus","This is it ${faceStatus.name}")
+        runOnUiThread {
+            binding.tvCount.setText((cameraManager.graphicOverlay.graphics.size).toString())
+        }
+//        Log.e("facestatus","This is it ${faceStatus.name}")
 //       when(faceStatus){}
     }
 
